@@ -2,23 +2,15 @@
 
 import os
 import discord
-import requests
 from src.modules.Vouch import Vouch
 from src.modules.Embedded import Embedded
 
-'''
-# for use without pipenv
-from dotenv import load_dotenv
-load_dotenv()
-'''
-RED = 0xEF233C
-BLUE = 0x00A6ED
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
 client = discord.Client()
-vouch_words = ['vouch', 'voch', 'v']
+
 def get_quote():
     # deserialize json
     resp = requests.get("https://zenquotes.io/api/random").json()

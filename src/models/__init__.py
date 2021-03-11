@@ -1,6 +1,7 @@
 #src/models/__init__.py
-from sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 
-db = SQLAlchemy()
+engine = create_engine('sqlite:///:memory:', echo=True)
+db = declarative_base()
 
 from .User import *

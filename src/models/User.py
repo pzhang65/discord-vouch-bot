@@ -2,7 +2,7 @@
 from marshmallow import fields, Schema
 from . import db
 
-class User(db.Model):
+class User(Base):
 
     __tablename__ = 'users'
 

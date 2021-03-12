@@ -6,18 +6,17 @@ class Vouches(Base):
 
     __tablename__ = 'vouches'
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    giver = Column(String(128), nullable=False)
-    receiver = Column(String(128), nullable=False)
+    giver = Column(String(128), primary_key= True, nullable=False)
+    receiver = Column(String(128), primary_key= True, nullable=False)
     positive = Column(Boolean, nullable=False)
 
-    def __init__(self, give: str, receiver: str, positive: bool):
+    def __init__(self, data):
         '''
         Class constructor
         '''
-        self.giver = giver
-        self.receiver = receiver
-        self.positive = positive
+        self.giver = data.get('giver')
+        self.receiver = data.get('receiver')
+        self.positive = data.get('positive')
 
     def save(self, session):
         session.add(self)

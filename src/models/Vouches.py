@@ -1,11 +1,10 @@
 #src/modules/Vouches.py
 from sqlalchemy import Column, String, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
-from .User import User
+from . import Base
 
-Base = declarative_base()
+class Vouches(Base):
 
-class Vouches:
+    __tablename__ = 'vouches'
 
     id = Column(Integer, primary_key=True, nullable=False)
     giver = Column(String(128), nullable=False)
@@ -37,4 +36,4 @@ class Vouches:
 
     @staticmethod
     def get_vouch(giver: str, receiver: str, session):
-        return session.query(User).filter_by(giver=giver, receiver=receiver).first()
+        return session.query(Vouches).filter_by(giver=giver, receiver=receiver).first()

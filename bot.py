@@ -1,18 +1,19 @@
 # bot.py
 import os
 import discord
-from src.modules.Vouches import Vouches
+from src.models import Session
+from src.models.User import User
+from src.models.Vouches import Vouches
 from src.modules.Commands import Commands
-from src.models import engine, Session
-from src.models.User import User, Base
+
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
 client = discord.Client()
 
+# Create a session using sessionmaker to connect with DB
 session = Session()
-Base.metadata.create_all(engine)
 
 word_list = ['positive', 'negative']
 

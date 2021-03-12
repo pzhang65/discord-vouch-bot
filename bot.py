@@ -5,7 +5,7 @@ from src.models import Session
 from src.models.User import User
 from src.models.Vouches import Vouches
 from src.modules.Commands import Commands
-
+#from datetime import datetime, timedelta
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
@@ -102,10 +102,15 @@ async def on_message(message):
             target = str(message.mentions[0])
             positive = check_positive(words)
 
+            '''
+            if not User.get_user(user, session):
+                create_user(user, session)
+
+
             if not check_cooldown(user, session): # false is <1 hr
                 await cmds.send_cooldown(cmds.cooldown)
                 return
-
+            '''
             vouch = check_duplicate_vouch(user, target, positive, session)
             if vouch:
                 old_pos = vouch.positive
@@ -120,6 +125,7 @@ async def on_message(message):
 
                     await cmds.revouch(f'Changed last {old_pos} vouch to {new_pos} vouch\n{user.user} now has {user.vouches} vouches.')
                     return
+
 
             if not User.get_user(target, session):
                 create_user(target, session)

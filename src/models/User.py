@@ -1,6 +1,6 @@
 #src/modules/User.py
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from . import Base
 
 class User(Base):
@@ -9,8 +9,7 @@ class User(Base):
 
     user = Column(String(128), primary_key=True, nullable=False)
     vouches = Column(Integer, nullable=False, default=0)
-    last_vouch_at = Column(DateTime)
-    #vouchers = Column(String(), nullable=True)
+    #last_vouch_at = Column(DateTime)
 
     def __init__(self, data):
         """
@@ -18,7 +17,7 @@ class User(Base):
         """
         self.user = data.get('user')
         self.vouches = data.get('vouches')
-        self.last_vouch_at = datetime.datetime.utcnow()
+        #self.last_vouch_at = datetime.datetime.utcnow()
 
     def save(self, session):
         session.add(self)

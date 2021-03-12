@@ -7,6 +7,8 @@ name = "pypi"
 discord = "*"
 python-dotenv = "*"
 requests = "*"
+marshmallow = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 

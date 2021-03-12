@@ -24,12 +24,19 @@ class Embedded:
         '''
             Sends an error message to a channel
         '''
-        embed = self.new_embed(message, color=self.RED, title='Vouch Error!')
+        embed = self.new_embed(message, color=self.RED, title='Vouch Command Error!')
         await self.msg.channel.send(embed=embed)
 
-    async def send_success(self, message: str):
+    async def send_vouch(self, message: str):
         '''
             Sends a success message to the object channel
         '''
-        embed = self.new_embed(message, color=self.GREEN, title='Vouch Success!')
+        embed = self.new_embed(message, color=self.GREEN, title='Vouch Applied!')
+        await self.msg.channel.send(embed=embed)
+
+    async def view_vouch(self, message: str):
+        '''
+            Sends a success message to the object channel
+        '''
+        embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         await self.msg.channel.send(embed=embed)

@@ -3,7 +3,8 @@ import os
 import discord
 from src.modules.Vouches import Vouches
 from src.modules.Commands import Commands
-from src.models.User import User, Session, Base, engine
+from src.models import engine, Session
+from src.models.User import User, Base
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')

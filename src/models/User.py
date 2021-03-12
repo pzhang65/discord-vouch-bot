@@ -1,13 +1,8 @@
 #src/modules/User.py
-import discord
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-
-engine = create_engine('sqlite:///vouches.db')
-Session = sessionmaker(bind=engine)
 
 class User(Base):
 

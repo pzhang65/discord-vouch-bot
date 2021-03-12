@@ -1,17 +1,19 @@
 # bot.py
 import os
 import discord
-from src.modules.Vouches import Vouches
+from src.models import Session
+from src.models.User import User
+from src.models.Vouches import Vouches
 from src.modules.Commands import Commands
-from src.models.User import User, Session, Base, engine
+
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
 client = discord.Client()
 
+# Create a session using sessionmaker to connect with DB
 session = Session()
-Base.metadata.create_all(engine)
 
 word_list = ['positive', 'negative']
 
@@ -27,8 +29,13 @@ def create_user(user: str, session):
     user_obj.save(session)
     return True
 
-def check_duplicate_vouch(giver: str, receiver: str):
-    pass
+def check_duplicate_vouch(giver: str, receiver: str, session):
+    # Returns none if no vouch matches giver, receiver filter
+    vouch = Vouches.get_vouch(giver, receiver, session)
+    if vouch:
+        return True # Cannot give more than 1 vouch to the same user
+    else:
+        return False
 
 def update_vouch(target: str, positive: bool, session):
     user_obj = User.get_user(target, session)
@@ -62,18 +69,23 @@ async def on_message(message):
         cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 3 or words[-1] not in word_list:
-                await cmds.send_error('Valid formats:\n$vouch @user positive\n$vouch @user negative')
+                await cmds.send_error(cmds.vformat)
                 return
 
 
         if message.author.id == message.mentions[0].id:
-                await cmds.send_error('You cannot vouch for yourself.')
+                await cmds.send_error(cmds.yourself)
                 return
 
         else:
             user = str(message.author)
             target = str(message.mentions[0])
             positive = check_positive(words)
+
+            print(check_duplicate_vouch(user, target, session))
+            if check_duplicate_vouch(user, target, session):
+                await cmds.send_error(cmds.dup)
+                return
 
             if not User.get_user(target, session):
                 create_user(target, session)
@@ -91,7 +103,7 @@ async def on_message(message):
         cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 2:
-                await cmds.send_error('Valid formats:\n$check @user')
+                await cmds.send_error(cmds.cformat)
                 return
 
         else:

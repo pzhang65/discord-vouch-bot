@@ -6,6 +6,10 @@ class Commands:
     BLUE = 0x00A6ED
     GREEN = 0x3EC300
     YELLOW = 0xFFB400
+    vformat = 'Valid formats:\n$vouch @user positive\n$vouch @user negative'
+    cformat = 'Valid formats:\n$check @user'
+    yourself = 'You cannot vouch for yourself.'
+    dup = 'Cannot vouch for the same user more than once.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg

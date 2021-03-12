@@ -1,6 +1,6 @@
 import discord
 
-class Embedded:
+class Commands:
 
     RED = 0xEF233C
     BLUE = 0x00A6ED
@@ -40,3 +40,12 @@ class Embedded:
         '''
         embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         await self.msg.channel.send(embed=embed)
+
+    async def help(self):
+        pass
+
+    async def about(self):
+        pass
+
+    async def top(self):
+        pass

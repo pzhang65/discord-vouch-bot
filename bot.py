@@ -1,8 +1,8 @@
 # bot.py
 import os
 import discord
-from src.modules.Vouch import Vouch
-from src.modules.Embedded import Embedded
+from src.modules.Vouches import Vouches
+from src.modules.Commands import Commands
 from src.models.User import User, Session, Base, engine
 
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -26,6 +26,9 @@ def create_user(user: str, session):
     user_obj = User(data)
     user_obj.save(session)
     return True
+
+def check_duplicate_vouch(giver: str, receiver: str):
+    pass
 
 def update_vouch(target: str, positive: bool, session):
     user_obj = User.get_user(target, session)
@@ -56,16 +59,15 @@ async def on_message(message):
     words = msg.split()
 
     if msg.startswith('$vouch'):
-        emb = Embedded(message)
+        cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 3 or words[-1] not in word_list:
-                error = Embedded(message)
-                await emb.send_error('Valid formats:\n$vouch @user positive\n$vouch @user negative')
+                await cmds.send_error('Valid formats:\n$vouch @user positive\n$vouch @user negative')
                 return
 
 
         if message.author.id == message.mentions[0].id:
-                await emb.send_error('You cannot vouch for yourself.')
+                await cmds.send_error('You cannot vouch for yourself.')
                 return
 
         else:
@@ -83,14 +85,13 @@ async def on_message(message):
 
             update_vouch(target, positive, session)
             vouch_msg = f'{user} is giving {target} a {pos} vouch.\nZehro suck my nuts'
-            await emb.send_vouch(vouch_msg)
+            await cmds.send_vouch(vouch_msg)
 
     if msg.startswith('$check'):
-        emb = Embedded(message)
+        cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 2:
-                error = Embedded(message)
-                await emb.send_error('Valid formats:\n$check @user')
+                await cmds.send_error('Valid formats:\n$check @user')
                 return
 
         else:
@@ -98,11 +99,12 @@ async def on_message(message):
             user = User.get_user(target, session)
 
             if not user:
-                error = Embedded(message)
-                await emb.view_vouch(f'{target} has no reputation!')
+                await cmds.view_vouch(f'{target} has no vouches!')
                 return
 
             msg = f'{user.user} has {user.vouches} vouches.'
-            await emb.view_vouch(msg)
+            await cmds.view_vouch(msg)
+
+
 
 client.run(TOKEN)

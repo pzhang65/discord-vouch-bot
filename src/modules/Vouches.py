@@ -1,7 +1,7 @@
 #src/modules/Vouch.py
 import discord
 
-class Vouch:
+class Vouches:
     format = 'Please follow this format: $vouch @user positive/negative'
 
     def __init__(self, user: discord.User, target: discord.User, positive: bool):

@@ -45,6 +45,10 @@ class Commands:
         embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         await self.msg.channel.send(embed=embed)
 
+    async def revouch(self, message: str):
+        embed = self.new_embed(message, color=self.YELLOW, title='Changing Existing Vouch...')
+        await self.msg.channel.send(embed=embed)
+
     async def help(self):
         pass
 

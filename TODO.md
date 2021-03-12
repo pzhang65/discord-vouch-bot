@@ -2,7 +2,6 @@
 
 ### Urgent
 - [ ] Vouching cooldowns
-- [ ] Change vouch option
 - [ ] Dockerize project for deployment
 
 ### Features
@@ -12,6 +11,7 @@
 
 ## Completed
 - [x] Check for duplicate vouchers
+- [x] Change vouch option
 
 Vouching cooldowns:
 - cooldown for receiving and giving?

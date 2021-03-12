@@ -1,6 +1,7 @@
 #src/modules/Vouches.py
-from sqlalchemy import Column, String, Boolean, ForeignKey
+from sqlalchemy import Column, String, Boolean, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from .User import User
 
 Base = declarative_base()
 
@@ -20,8 +21,8 @@ class Vouches:
         self.positive = positive
 
     def save(self, session):
-        db.session.add(self)
-        db.session.commit()
+        session.add(self)
+        session.commit()
 
     def update(self, positive: bool, session):
         setattr(self, 'positive', positive)
@@ -35,5 +36,5 @@ class Vouches:
         return f'Giver: {self.giver}\nReceiver: {self.receiver}\nPositive: {self.positive}'
 
     @staticmethod
-    def get_vouch(giver: str, session):
+    def get_vouch(giver: str, receiver: str, session):
         return session.query(User).filter_by(giver=giver, receiver=receiver).first()

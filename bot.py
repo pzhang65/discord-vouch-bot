@@ -58,6 +58,14 @@ def check_duplicate_vouch(giver: str, receiver: str, positive: bool, session):
 
         return False
 
+def check_cooldown(giver: str, session):
+    user_obj = User.get_user(giver, session)
+    td = datetime.datetime.utcnow() - user_obj.last_vouch_at
+    if td.total_seconds() < 3600: # less than 1 hr
+        return False
+    else:
+        return True # cooldown is up
+
 
 @client.event
 async def on_ready():
@@ -85,7 +93,6 @@ async def on_message(message):
                 await cmds.send_error(cmds.vformat)
                 return
 
-
         if message.author.id == message.mentions[0].id:
                 await cmds.send_error(cmds.yourself)
                 return
@@ -94,6 +101,10 @@ async def on_message(message):
             user = str(message.author)
             target = str(message.mentions[0])
             positive = check_positive(words)
+
+            if not check_cooldown(user, session): # false is <1 hr
+                await cmds.send_cooldown(cmds.cooldown)
+                return
 
             vouch = check_duplicate_vouch(user, target, positive, session)
             if vouch:

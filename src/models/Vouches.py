@@ -6,12 +6,11 @@ class Vouches(Base):
 
     __tablename__ = 'vouches'
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    giver = Column(String(128), nullable=False)
-    receiver = Column(String(128), nullable=False)
+    giver = Column(String(128), primary_key= True, nullable=False)
+    receiver = Column(String(128), primary_key= True, nullable=False)
     positive = Column(Boolean, nullable=False)
 
-    def __init__(self, give: str, receiver: str, positive: bool):
+    def __init__(self, giver: str, receiver: str, positive: bool):
         '''
         Class constructor
         '''

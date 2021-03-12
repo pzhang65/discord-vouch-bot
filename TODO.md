@@ -1,14 +1,17 @@
 # TODO LIST
 
 ### Urgent
-- [ ] Check for duplicate vouchers
 - [ ] Vouching cooldowns
+- [ ] Change vouch option
 - [ ] Dockerize project for deployment
 
 ### Features
 - [ ] Extra tags i.e. Scammer, whale, etc.
 - [ ] Better project layout
 
+
+## Completed
+- [x] Check for duplicate vouchers
 
 Vouching cooldowns:
 - cooldown for receiving and giving?

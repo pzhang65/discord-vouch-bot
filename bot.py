@@ -130,12 +130,6 @@ async def on_message(message):
                 await cmds.send_error(cmds.aformat)
                 return
 
-        try:
-            number = int(words[-1])
-        except ValueError:
-            await cmds.send_error('Invalid number format')
-            return
-
         else:
             try:
                 number = int(words[-1])

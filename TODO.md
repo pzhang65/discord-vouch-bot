@@ -1,9 +1,8 @@
 # TODO LIST
 
 ### Urgent
-- [ ] administrator role (able to edit user/vouches)
-- [ ] check vouch -> grab discord picture too
 - [ ] Dockerize project for deployment
+- [ ] Deploy to a VPS (maybe aws?)
 
 ### Features
 - [ ] Extra tags i.e. Scammer, whale, etc.
@@ -14,6 +13,8 @@
 - [x] Check for duplicate vouchers
 - [x] Change vouch option
 - [x] Vouching cooldowns
+- [x] administrator role (able to edit user/vouches)
+- [x] check vouch -> grab discord picture too
 
 Vouching cooldowns:
 - cooldown for receiving and giving?

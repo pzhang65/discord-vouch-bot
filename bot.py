@@ -18,60 +18,6 @@ session = Session()
 
 word_list = ['positive', 'negative']
 
-def check_positive(words: list):
-    if words[-1] == "positive":
-        return True
-    else:
-        return False
-
-def create_user(user: str, session):
-    data = {'user': user, 'vouches': 0}
-    user_obj = User(data)
-    user_obj.save(session)
-    return True
-
-def update_user_vouch(target: str, positive: bool, session):
-    user_obj = User.get_user(target, session)
-    if positive:
-        user_obj.vouches += 1
-    else:
-        user_obj.vouches -= 1
-
-    user_obj.update(user_obj.vouches, session)
-
-def change_vouch(vouch: Vouches, positive: bool, session):
-    vouch.update(positive, session)
-    # update_user_vouch twice because -1 -> +1 = 2
-    update_user_vouch(vouch.receiver, positive, session)
-    update_user_vouch(vouch.receiver, positive, session)
-
-def check_duplicate_vouch(giver: str, receiver: str, positive: bool, session):
-    # Returns none if no vouch matches giver, receiver filter
-    vouch = Vouches.get_vouch(giver, receiver, session)
-    if vouch:
-        return vouch
-
-    else:
-        # Creates vouch and saves to db
-        data = {'giver': giver, 'receiver': receiver, 'positive': positive}
-        vouch_obj = Vouches(data)
-        vouch_obj.save(session)
-
-        return False
-
-def check_cooldown(giver: str, session):
-    vouch_obj = Vouches.get_latest(giver, session)
-    if not vouch_obj: # If never vouched then there is no cd
-        return True
-
-    td = datetime.datetime.utcnow() - vouch_obj.given_at
-    print(td)
-    print(vouch_obj.given_at)
-    if td.total_seconds() > 3600: # more than 1 hr
-        return True
-    else:
-        return False # 1 hr cd not up
-
 @client.event
 async def on_ready():
     for guild in client.guilds:
@@ -90,9 +36,19 @@ async def on_message(message):
 
     msg = message.content.lower()
     words = msg.split()
+    #admin_role = message.guild.roles.find()
+
+    bot_avatar = client.user.avatar_url
+
+    cmds = Commands(message)
+
+    if msg.startswith('$vouchhelp'):
+        #cmds = Commands(message)
+        await cmds.help(bot_avatar)
+        return
 
     if msg.startswith('$vouch'):
-        cmds = Commands(message)
+        #cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 3 or words[-1] not in word_list:
                 await cmds.send_error(cmds.vformat)
@@ -105,14 +61,16 @@ async def on_message(message):
 
         else:
             user = str(message.author)
-            target = str(message.mentions[0])
-            positive = check_positive(words)
+            user_avatar = message.author.avatar_url
 
-            if not check_cooldown(user, session):
+            target = str(message.mentions[0])
+            positive = Commands.check_positive(words)
+
+            if not Commands.check_cooldown(user, session):
                 await cmds.send_cooldown(cmds.cooldown)
                 return
 
-            vouch = check_duplicate_vouch(user, target, positive, session)
+            vouch = Commands.check_duplicate_vouch(user, target, positive, session)
             # vouch returned if same user and target
             if vouch:
                 old_pos = vouch.positive
@@ -121,28 +79,28 @@ async def on_message(message):
                     await cmds.send_error(cmds.dup) # cannot vouch same person twice
                     return
                 else: # vouch was changed from positive -> negative or vice versa
-                    change_vouch(vouch, positive, session)
-                    user = User.get_user(target, session)
+                    Commands.change_vouch(vouch, positive, session)
+                    target = User.get_user(target, session)
                     new_pos = (lambda x: "positive" if x == True else "negative")(positive)
                     old_pos = (lambda x: "negative" if x == "positive" else "positive")(new_pos)
 
-                    await cmds.revouch(f'Changed last {old_pos} vouch to {new_pos} vouch\n{user.user} now has {user.vouches} vouches.')
+                    await cmds.revouch(f'Changed last {old_pos} vouch to {new_pos} vouch.\n{target.user} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
             if not User.get_user(target, session):
-                create_user(target, session)
+                Commands.create_user(target, session)
 
             if positive:
                 pos = "positive"
             else:
                 pos = "negative"
 
-            update_user_vouch(target, positive, session)
+            Commands.update_user_vouch(target, positive, session)
             vouch_msg = f'{user} is giving {target} a {pos} vouch.\nZehro suck my nuts'
-            await cmds.send_vouch(vouch_msg)
+            await cmds.send_vouch(vouch_msg, user, user_avatar)
 
     if msg.startswith('$check'):
-        cmds = Commands(message)
+        #cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 2:
                 await cmds.send_error(cmds.cformat)
@@ -150,15 +108,49 @@ async def on_message(message):
 
         else:
             target = str(message.mentions[0])
+            target_avatar = message.mentions[0].avatar_url
+
             user = User.get_user(target, session)
 
             if not user:
-                await cmds.view_vouch(f'{target} has no vouches!')
+                await cmds.view_vouch(f'{target} has no vouches!', target, target_avatar)
                 return
 
             msg = f'{user.user} has {user.vouches} vouches.'
-            await cmds.view_vouch(msg)
+            await cmds.view_vouch(msg, target, target_avatar)
+
+    if msg.startswith('$adminvouch'):
+        admin = discord.utils.get(message.author.roles, name='admin')
+        if not admin:
+            await cmds.send_error('You do not have admin permission.')
+            return
 
 
+        if len(message.mentions) == 0 or len(words) < 3:
+                await cmds.send_error(cmds.aformat)
+                return
+
+        try:
+            number = int(words[-1])
+        except ValueError:
+            await cmds.send_error('Invalid number format')
+            return
+
+        else:
+            try:
+                number = int(words[-1])
+            except ValueError:
+                await cmds.send_error('Invalid number format')
+                return
+
+            target = str(message.mentions[0])
+            target_avatar = message.mentions[0].avatar_url
+
+
+            user_obj = User.get_user(target, session)
+            user_obj.update(number, session)
+
+            msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
+            await cmds.view_vouch(msg, user_obj.user, target_avatar)
 
 client.run(TOKEN)

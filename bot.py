@@ -1,6 +1,7 @@
 # bot.py
 import os
 import discord
+import datetime
 from src.models import Session
 from src.models.User import User
 from src.models.Vouches import Vouches
@@ -58,6 +59,18 @@ def check_duplicate_vouch(giver: str, receiver: str, positive: bool, session):
 
         return False
 
+def check_cooldown(giver: str, session):
+    vouch_obj = Vouches.get_latest(giver, session)
+    if not vouch_obj: # If never vouched then there is no cd
+        return True
+
+    td = datetime.datetime.utcnow() - vouch_obj.given_at
+    print(td)
+    print(vouch_obj.given_at)
+    if td.total_seconds() > 3600: # more than 1 hr
+        return True
+    else:
+        return False # 1 hr cd not up
 
 @client.event
 async def on_ready():
@@ -95,13 +108,19 @@ async def on_message(message):
             target = str(message.mentions[0])
             positive = check_positive(words)
 
+            if not check_cooldown(user, session):
+                await cmds.send_cooldown(cmds.cooldown)
+                return
+
             vouch = check_duplicate_vouch(user, target, positive, session)
+            # vouch returned if same user and target
             if vouch:
                 old_pos = vouch.positive
-                if old_pos == positive: # cannot vouch same person twice
-                    await cmds.send_error(cmds.dup)
+                # check if old vouch is the same positive/negative as new vouch
+                if old_pos == positive:
+                    await cmds.send_error(cmds.dup) # cannot vouch same person twice
                     return
-                else:
+                else: # vouch was changed from positive -> negative or vice versa
                     change_vouch(vouch, positive, session)
                     user = User.get_user(target, session)
                     new_pos = (lambda x: "positive" if x == True else "negative")(positive)

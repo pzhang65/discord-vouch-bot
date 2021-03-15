@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///test.db')
+engine = create_engine('sqlite:///vouchbot.db')
 Session = sessionmaker(bind=engine)
 
 Base = declarative_base() # Declare Base for all models to inherit from

@@ -96,7 +96,7 @@ async def on_message(message):
                 pos = "negative"
 
             Commands.update_user_vouch(target, positive, session)
-            vouch_msg = f'{user} is giving {target} a {pos} vouch.\nZehro suck my nuts'
+            vouch_msg = f'{user} is giving {target} a {pos} vouch.'
             await cmds.send_vouch(vouch_msg, user, user_avatar)
 
     if msg.startswith('$check'):

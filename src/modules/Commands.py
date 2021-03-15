@@ -14,7 +14,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user'
     yourself = 'You cannot vouch for yourself.'
     dup = 'Cannot vouch for the same user more than once.'
-    cooldown = 'Please wait 1 hour before every vouch'
+    cooldown = 'Please wait 30 mins before every vouch'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -80,10 +80,10 @@ class Commands:
             return True
 
         td = datetime.datetime.utcnow() - vouch_obj.given_at
-        if td.total_seconds() > 5: # more than 1 hr
+        if td.total_seconds() > 1800: # more than 30 mins
             return True
         else:
-            return False # 1 hr cd not up
+            return False # 30 min cd not up
 
     async def send_error(self, message: str):
         '''
@@ -120,7 +120,7 @@ class Commands:
     async def help(self, avatar):
         embed = self.new_embed(description='Developed by Ess#0977, DM ideas/bugs to me.', color=self.BLUE, title='')
         embed.add_field(name='Features', value='Users can give (and check) positive (+1) or negative (-1) vouches to other users.\nVouches are stored in a database and are tied to Discord username (NOT server nickname).')
-        embed.add_field(name='Giving ($vouch)', value='A user can only give 1 vouch per hour.\nYou CANNOT give duplicate vouches to the same user.\nPrevious vouches CAN be changed from positive to negative and vice versa.\nVouches can be only given in the #vouches channels.')
+        embed.add_field(name='Giving ($vouch)', value='A user can only give 1 vouch per 30 mins.\nYou CANNOT give duplicate vouches to the same user.\nPrevious vouches CAN be changed from positive to negative and vice versa.\nVouches can be only given in the #vouches channels.')
         embed.add_field(name='Checking ($check)', value='Every user have a numerical vouch score that starts from 0.\nVouches can be checked in any text channel but the user must be pinged.')
         embed.set_author(name='Vouch Bot', icon_url=avatar)
         await self.msg.channel.send(embed=embed)

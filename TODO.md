@@ -1,8 +1,8 @@
 # TODO LIST
 
 ### Urgent
-- [ ] Dockerize project for deployment
-- [ ] Deploy to a VPS (maybe aws?)
+- [ ] Vouches cannot be set for users who do are no in users table yet. (Create a user first then set vouch if not user)
+- [ ] change positive/negative to +1/-1
 
 ### Features
 - [ ] Extra tags i.e. Scammer, whale, etc.
@@ -15,6 +15,8 @@
 - [x] Vouching cooldowns
 - [x] administrator role (able to edit user/vouches)
 - [x] check vouch -> grab discord picture too
+- [x] Dockerize project for deployment
+- [x] Deploy to an ec2 instance
 
 Vouching cooldowns:
 - cooldown for receiving and giving?

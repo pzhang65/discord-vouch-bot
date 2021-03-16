@@ -16,7 +16,7 @@ client = discord.Client()
 # Create a session using sessionmaker to connect with DB
 session = Session()
 
-word_list = ['positive', 'negative']
+word_list = ['+1', '-1']
 
 @client.event
 async def on_ready():
@@ -36,19 +36,16 @@ async def on_message(message):
 
     msg = message.content.lower()
     words = msg.split()
-    #admin_role = message.guild.roles.find()
 
     bot_avatar = client.user.avatar_url
 
     cmds = Commands(message)
 
     if msg.startswith('$vouchhelp'):
-        #cmds = Commands(message)
         await cmds.help(bot_avatar)
         return
 
     if msg.startswith('$vouch'):
-        #cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 3 or words[-1] not in word_list:
                 await cmds.send_error(cmds.vformat)
@@ -81,19 +78,19 @@ async def on_message(message):
                 else: # vouch was changed from positive -> negative or vice versa
                     Commands.change_vouch(vouch, positive, session)
                     target = User.get_user(target, session)
-                    new_pos = (lambda x: "positive" if x == True else "negative")(positive)
-                    old_pos = (lambda x: "negative" if x == "positive" else "positive")(new_pos)
+                    new_pos = (lambda x: "+1" if x == True else "-1")(positive)
+                    old_pos = (lambda x: "-1" if x == "+1" else "+1")(new_pos)
 
-                    await cmds.revouch(f'Changed last {old_pos} vouch to {new_pos} vouch.\n{target.user} now has {target.vouches} vouches.', user, user_avatar)
+                    await cmds.revouch(f'Changed previous {old_pos} vouch to {new_pos} vouch.\n{target.user} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
             if not User.get_user(target, session):
                 Commands.create_user(target, session)
 
             if positive:
-                pos = "positive"
+                pos = "+1"
             else:
-                pos = "negative"
+                pos = "-1"
 
             Commands.update_user_vouch(target, positive, session)
             vouch_msg = f'{user} is giving {target} a {pos} vouch.'
@@ -142,9 +139,16 @@ async def on_message(message):
 
 
             user_obj = User.get_user(target, session)
-            user_obj.update(number, session)
 
-            msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
-            await cmds.view_vouch(msg, user_obj.user, target_avatar)
+            if not user_obj:
+                Commands.create_user(target, session)
+                user_obj = User.get_user(target, session)
+                user_obj.update(number, session)
+                msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
+                await cmds.view_vouch(msg, user_obj.user, target_avatar)
+
+            else:
+                msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
+                await cmds.view_vouch(msg, user_obj.user, target_avatar)
 
 client.run(TOKEN)

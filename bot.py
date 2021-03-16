@@ -120,9 +120,9 @@ async def on_message(message):
             await cmds.view_vouch(msg, target, target_avatar)
 
     if msg.startswith('$adminvouch'):
-        admin = discord.utils.get(message.author.roles, name='admin')
+        admin = discord.utils.get(message.author.roles, name='Admin')
         if not admin:
-            await cmds.send_error('You do not have admin permission.')
+            await cmds.send_error('You do not have Admin permission.')
             return
 
 
@@ -134,7 +134,7 @@ async def on_message(message):
             try:
                 number = int(words[-1])
             except ValueError:
-                await cmds.send_error('Invalid number format')
+                await cmds.send_error('Invalid number format.')
                 return
 
             target = str(message.mentions[0])

@@ -14,7 +14,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user'
     yourself = 'You cannot vouch for yourself.'
     dup = 'Cannot vouch for the same user more than once.'
-    cooldown = 'Please wait 30 mins before every vouch'
+    cooldown = 'Please wait 30 mins between every vouch.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg

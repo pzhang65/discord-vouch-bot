@@ -1,10 +1,13 @@
 # Discord Vouch Bot
 
 A Discord bot that allow users within a server to give each other positive or negative vouches. Vouch score is saved in a SQLite database.
-Currently serving NA AAU Megaserver (1000+ users).
+Currently serving the **NA AAU Megaserver (1000+ users).**
+
+![Vouch bot demo](src/gifs/2.gif)
 
 ### Stack
 * Python (bot, modules, models)
+* discord.py (API wrapper for Discord)
 * SQLite3 (data persistence)
 * SQLAlchemy (ORM)
 * Docker + Docker Compose (for easy deployment, volume mounted for DB)

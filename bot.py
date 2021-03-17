@@ -84,6 +84,7 @@ async def on_message(message):
                     await cmds.revouch(f'Changed previous {old_pos} vouch to {new_pos} vouch.\n{target.user} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
+
             if not User.get_user(target, session):
                 Commands.create_user(target, session)
 
@@ -93,20 +94,26 @@ async def on_message(message):
                 pos = "-1"
 
             Commands.update_user_vouch(target, positive, session)
-            vouch_msg = f'{user} is giving {target} a {pos} vouch.'
+            updated_user = User.get_user(target, session)
+            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.'
             await cmds.send_vouch(vouch_msg, user, user_avatar)
 
     if msg.startswith('$check'):
         #cmds = Commands(message)
 
         if len(message.mentions) == 0 or len(words) < 2:
-                await cmds.send_error(cmds.cformat)
-                return
+            await cmds.send_error(cmds.cformat)
+            return
+
+        target = str(message.mentions[0])
+        target_avatar = message.mentions[0].avatar_url
+
+        if words[-1] == 'history':
+            history =  Vouches.get_history(target, session)
+            await cmds.send_history(history, target, target_avatar)
+            return
 
         else:
-            target = str(message.mentions[0])
-            target_avatar = message.mentions[0].avatar_url
-
             user = User.get_user(target, session)
 
             if not user:

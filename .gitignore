@@ -1,4 +1,6 @@
 .env
+.env.production
 .dockerignore
 __pycache__
 docker-compose.yml
+docker-compose.yml.prod

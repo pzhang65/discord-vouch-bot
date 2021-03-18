@@ -1,4 +1,4 @@
-#src/modules/Vouches.py
+#src/models/Vouches.py
 from sqlalchemy import Column, String, Boolean, Integer, DateTime, desc
 from sqlalchemy.sql import func
 import datetime
@@ -8,11 +8,10 @@ from . import Base
 class Vouches(Base):
 
     __tablename__ = 'vouches'
-
-    giver = Column(String(128), primary_key= True, nullable=False)
-    receiver = Column(String(128), primary_key= True, nullable=False)
+    giver = Column(String(128), primary_key=True, nullable=False)
+    receiver = Column(String(128), primary_key=True, nullable=False)
     positive = Column(Boolean, nullable=False)
-    given_at = Column(DateTime, default=datetime.datetime.utcnow)
+    given_at = Column(DateTime, default=datetime.datetime.utcnow) 
 
     def __init__(self, data):
         '''
@@ -42,6 +41,10 @@ class Vouches(Base):
     @staticmethod
     def get_vouch(giver: str, receiver: str, session):
         return session.query(Vouches).filter_by(giver=giver, receiver=receiver).first()
+
+    @staticmethod
+    def get_history(receiver: str, session):
+        return session.query(Vouches).filter(Vouches.receiver == receiver).all()
 
     @staticmethod
     def get_latest(giver: str, session):

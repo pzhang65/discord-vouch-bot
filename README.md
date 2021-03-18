@@ -15,8 +15,8 @@ Currently serving the **NA AAU Megaserver (1000+ users).**
 
 ### Commands
 Users have two commands: `$vouch` and `$check`
-* `$vouch @user +1/-1` to give vouches to users
-* `$check @user` to check a user's vouches
+* `$vouch @user +1/-1` to give vouches to users. Existing vouches can be changed from +1 to -1 and vice versa.
+* `$check @user`  to check a user's vouches. `$check @user history` to check a user's vouch history
 * `$vouchhelp` for more info
 
 Admins have the above commands and `$adminvouch`

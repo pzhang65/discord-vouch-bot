@@ -1,5 +1,5 @@
 #src/modules/User.py
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from . import Base
 
 class User(Base):
@@ -8,7 +8,10 @@ class User(Base):
 
     user = Column(String(128), primary_key=True, nullable=False)
     vouches = Column(Integer, nullable=False, default=0)
-
+    '''
+    scammer = Column(Boolean, nullable=True, default=False)
+    reputable = Column(Boolean, nullable=True, default=False)
+    '''
     def __init__(self, data):
         """
         Class constructor

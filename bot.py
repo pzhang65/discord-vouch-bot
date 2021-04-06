@@ -116,7 +116,7 @@ async def on_message(message):
             '''
             Commands.update_user_vouch(target, positive, session)
             updated_user = User.get_user(target, session)
-            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.'
+            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
             await cmds.send_vouch(vouch_msg, user, user_avatar)
 
     '''
@@ -148,7 +148,7 @@ async def on_message(message):
                 await cmds.view_vouch(f'{target} has no vouches!', target, target_avatar)
                 return
 
-            msg = f'{user.user} has {user.vouches} vouches.'
+            msg = f'{user.user} has {user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
             await cmds.view_vouch(msg, target, target_avatar)
 
     '''

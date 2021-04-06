@@ -9,12 +9,12 @@ class Commands:
     BLUE = 0x00A6ED
     GREEN = 0x3EC300
     YELLOW = 0xFFB400
-    vformat = 'Valid formats:\n$vouch @user +1\n$vouch @user -1'
-    aformat = 'Valid formats:\n$adminvouch @user number'
-    cformat = 'Valid formats:\n$check @user\n$check @user history'
-    yourself = 'You cannot vouch for yourself.'
-    dup = 'Cannot give a duplicate vouch to the same user.'
-    cooldown = 'Please wait 30 mins between every vouch.'
+    vformat = 'Valid formats:\n$vouch @user +1\n$vouch @user -1\n$vouchhelp for more info'
+    aformat = 'Valid formats:\n$adminvouch @user number\n$vouchhelp for more info'
+    cformat = 'Valid formats:\n$check @user\n$check @user history\n$vouchhelp for more info'
+    yourself = 'You cannot vouch for yourself.\n$vouchhelp for more info'
+    dup = 'Cannot give a duplicate vouch to the same user.\n$vouchhelp for more info'
+    cooldown = 'Please wait 30 mins between every vouch.\n$vouchhelp for more info'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -172,10 +172,10 @@ class Commands:
         Sends a help/info message relating to the bot, it's features and commands.
         '''
         embed = self.new_embed(description='Developed by Ess#0977, DM ideas/bugs to me.', color=self.BLUE, title='')
-        embed.add_field(name='Features', value='Users can give (and check) +1 or -1 vouches to other users.\nVouches are stored in a database and are tied to Discord username (NOT server nickname).')
+        embed.add_field(name='Features', value='Users can give and check +1 or -1 vouches to other users.\nVouches are stored in a database and are tied to Discord username (NOT server nickname).')
         embed.add_field(name='Giving ($vouch)', value='A user can only give 1 vouch per 30 mins.\nYou CANNOT give duplicate vouches to the same user.\nPrevious vouches CAN be changed from positive to negative and vice versa.\nVouches can be only given in the #vouches channels.')
-        embed.add_field(name='Checking ($check)', value='Every user have a numerical vouch score that starts from 0.\nVouches can be checked in any text channel but the user must be pinged.')
-        embed.set_author(name='Vouch Bot', icon_url=avatar)
+        embed.add_field(name='Checking ($check)', value="Check user's vouch score with a @mention.\n$check @mention history to check from whom the vouches came from")
+        embed.set_author(name='Vouch Bot v1.4.0', icon_url=avatar)
         await self.msg.channel.send(embed=embed)
 
     async def about(self):

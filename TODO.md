@@ -18,6 +18,7 @@
 - [x] Deploy to an ec2 instance
 - [x] change positive/negative to +1/-1
 - [x] Vouches cannot be set for users who do are no in users table yet. (Create a user first then set vouch if not user)
+- [x] Vouch history
 
 Vouching cooldowns:
 - cooldown for receiving and giving?

@@ -1,7 +1,7 @@
 # TODO LIST
 
 ### Urgent
-
+- [ ] Migrate user table primary key to discord ID **Discord nitro reverts discord username ID upon expiry so users may unexpectedly lose vouches
 
 ### Features
 - [ ] Extra tags i.e. Scammer, whale, etc.

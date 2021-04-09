@@ -2,6 +2,7 @@
 
 ### Urgent
 - [ ] Migrate user table primary key to discord ID **Discord nitro reverts discord username ID upon expiry so users may unexpectedly lose vouches
+- [ ] Add regex to command recognition
 
 ### Features
 - [ ] Extra tags i.e. Scammer, whale, etc.

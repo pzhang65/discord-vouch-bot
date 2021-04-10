@@ -75,7 +75,7 @@ async def on_message(message):
             '''
             Every vouch has a self generated time when saved.
             This time is checked when a user gives a vouch.
-            User's last given vouch time cannot be <30 mins.
+            User's last given vouch time cannot be <5 mins.
             '''
             if not Commands.check_cooldown(user, session):
                 await cmds.send_cooldown(cmds.cooldown)

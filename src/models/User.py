@@ -7,8 +7,8 @@ class User(Base):
 
     __tablename__ = 'users'
 
-    discord_id = Column(Integer, primary_key=True)
-    user = Column(String(128), nullable=False)
+    discord_id = Column(Integer)
+    user = Column(String(128), primary_key=True, nullable=False)
     vouches = Column(Integer, nullable=False, default=0)
     '''
     # future columns
@@ -45,7 +45,7 @@ class User(Base):
 
     @staticmethod
     def get_user(discord_id: int, session):
-        return session.query(User).filter_by(user=user).first()
+        return session.query(User).filter_by(discord_id=discord_id).first()
 
     @staticmethod
     def get_all_users(session):

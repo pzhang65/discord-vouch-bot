@@ -51,11 +51,11 @@ class Commands:
         user_obj.save(session)
 
     @staticmethod
-    def update_user_vouch(target: str, positive: bool, session):
+    def update_user_vouch(target_id: int, positive: bool, session):
         '''
         Get user first from database, then update vouch number
         '''
-        user_obj = User.get_user(target, session)
+        user_obj = User.get_user(target_id, session)
         if positive:
             user_obj.vouches += 1
         else:
@@ -128,12 +128,13 @@ class Commands:
         embed.set_author(name=user, icon_url=avatar)
         await self.msg.channel.send(embed=embed)
 
-    async def view_vouch(self, message: str, user: str, avatar):
+    async def view_vouch(self, message: str, user_id: int, user: str, avatar):
         '''
         Sends a success message to the object channel
         '''
         embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         embed.set_author(name=user, icon_url=avatar)
+        embed.set_footer(text=f'Discord ID: {user_id}')
         await self.msg.channel.send(embed=embed)
 
     async def revouch(self, message: str, user: str, avatar):

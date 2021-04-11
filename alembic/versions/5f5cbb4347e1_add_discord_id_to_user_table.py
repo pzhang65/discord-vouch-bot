@@ -17,8 +17,10 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('users', sa.Column('discord_id', sa.Integer))
+    with op.batch_alter_table("users") as batch_op:
+        batch_op.add_column(sa.Column('discord_id', sa.Integer))
 
 
 def downgrade():
-    op.drop_column('users', 'discord_id')
+    with op.batch_alter_table("users") as batch_op:
+        batch_op.drop_column('discord_id')

@@ -43,8 +43,8 @@ async def on_message(message):
     cmds = Commands(message) # Initialize command object for sending commands
 
     '''
-    $vouchhelp sends an emb msg with description of various commands
-    and how the bot operates.
+    Finds the unique discord id of all users in User table
+    and updates 'discord_id' column.
     '''
     if msg.startswith('$convertall'):
         user_dict = User.get_all_users(session)
@@ -60,6 +60,10 @@ async def on_message(message):
                 await cmds.send_message(f"{username} not found in server.")
         return
 
+    '''
+    $vouchhelp sends an emb msg with description of various commands
+    and how the bot operates.
+    '''
     if msg.startswith('$vouchhelp'):
         await cmds.help(bot_avatar)
         return
@@ -80,14 +84,13 @@ async def on_message(message):
                 return
 
         else:
-
-            discord_id = int(message.author.id)
             user = str(message.author)
+            user_id = int(message.author.id)
             user_avatar = message.author.avatar_url
 
-            print(discord_id)
 
             target = str(message.mentions[0])
+            target_id = int(message.mentions[0].id)
             positive = Commands.check_positive(words) # Assigns boolean value to +1/-1
 
             '''
@@ -95,6 +98,7 @@ async def on_message(message):
             This time is checked when a user gives a vouch.
             User's last given vouch time cannot be <5 mins.
             '''
+            # check_cooldown() returns False if cooldown not up
             if not Commands.check_cooldown(user, session):
                 await cmds.send_cooldown(cmds.cooldown)
                 return
@@ -111,16 +115,18 @@ async def on_message(message):
 
                 else: # Change vouch from pos -> neg or vice versa
                     Commands.change_vouch(vouch, positive, session)
-                    target = User.get_user(target, session)
+                    target = User.get_user(target_id, session)
                     new_pos = (lambda x: "+1" if x == True else "-1")(positive)
                     old_pos = (lambda x: "-1" if x == "+1" else "+1")(new_pos)
 
-                    await cmds.revouch(f'Changed previous {old_pos} vouch to {new_pos} vouch.\n{target.user} now has {target.vouches} vouches.', user, user_avatar)
+                    await cmds.revouch(f'Changed previous {old_pos} vouch to {new_pos} vouch.\n\
+                        {target.user} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
             # Check to see if vouch receiver is in user database
-            if not User.get_user(target, session):
-                Commands.create_user(target, session) # Create user if not found
+            if not User.get_user(target_id, session):
+                new_user = User({'discord_id': target_id, 'user': target, 'vouches': 0})
+                new_user.save()
 
             if positive: # Assigning literal for use in vouch_msg
                 pos = "+1"
@@ -132,9 +138,11 @@ async def on_message(message):
             value gets modified and the updated user is retrieved.
             New updated vouch value gets sent out.
             '''
-            Commands.update_user_vouch(target, positive, session)
-            updated_user = User.get_user(target, session)
-            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
+            Commands.update_user_vouch(target_id, positive, session)
+            updated_user = User.get_user(target_id, session)
+
+            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.\n\
+                Tip: $check @mention history to see full vouch history.'
             await cmds.send_vouch(vouch_msg, user, user_avatar)
 
     '''
@@ -149,6 +157,7 @@ async def on_message(message):
             return
 
         target = str(message.mentions[0])
+        target_id = int(message.mentions[0].id)
         target_avatar = message.mentions[0].avatar_url
 
         # This checks for $vouch @mention history
@@ -160,14 +169,15 @@ async def on_message(message):
 
         else: # Just check for numerical vouch value
             # Get the @mention user
-            user = User.get_user(target, session)
+            user = User.get_user(target_id, session)
 
             if not user: # if user does not exist, it means user has no vouches
-                await cmds.view_vouch(f'{target} has no vouches!', target, target_avatar)
+                await cmds.view_vouch(f'{target} has no vouches!', target_id, target, target_avatar)
                 return
 
-            msg = f'{user.user}({user.discord_id}) has {user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
-            await cmds.view_vouch(msg, target, target_avatar)
+            msg = f'{user.user} has {user.vouches} vouches.\n\
+                Tip: $check @mention history to see full vouch history.'
+            await cmds.view_vouch(msg, target_id, target, target_avatar)
 
     '''
     Users with the role "Admin" can manually set the vouches column in a user row
@@ -194,21 +204,24 @@ async def on_message(message):
                 return
 
             target = str(message.mentions[0])
+            target_id = int(message.mentions[0].id)
             target_avatar = message.mentions[0].avatar_url
 
-            user_obj = User.get_user(target, session)
+            user = User.get_user(target_id, session)
 
-            # If user doesn't have a vouch score yet, create one and set their vouch score
-            if not user_obj:
-                Commands.create_user(target, session)
-                user_obj = User.get_user(target, session)
-                user_obj.update(number, session)
-                msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
-                await cmds.view_vouch(msg, user_obj.user, target_avatar)
+            # If user doesn't have a vouch score yet, create the user and set their vouch score
+            if not user:
+                new_user = User({'discord_id': target_id, 'user': target, 'vouches': number})
+                new_user.save(session)
+
+                msg = f'{new_user.user} now has {new_user.vouches} vouches.'
+                await cmds.view_vouch(msg, new_user.user, target_avatar)
 
             else:
-                msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
-                await cmds.view_vouch(msg, user_obj.user, target_avatar)
+                user.vouches = number
+                user.save(session)
+                msg = f'{user.user} now has {user.vouches} vouches.'
+                await cmds.view_vouch(msg, user.user, target_avatar)
 
 
 client.run(TOKEN)

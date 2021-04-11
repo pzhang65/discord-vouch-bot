@@ -41,16 +41,6 @@ class Commands:
             return False
 
     @staticmethod
-    def create_user(user: str, session):
-        '''
-        Create a dictionary and pass that to User()
-        then save user object into User table
-        '''
-        data = {'user': user, 'vouches': 0}
-        user_obj = User(data)
-        user_obj.save(session)
-
-    @staticmethod
     def update_user_vouch(target_id: int, positive: bool, session):
         '''
         Get user first from database, then update vouch number
@@ -64,7 +54,7 @@ class Commands:
         user_obj.update(user_obj.vouches, session)
 
     @staticmethod
-    def change_vouch(vouch: Vouches, positive: bool, session):
+    def change_vouch(target_id: int, vouch: Vouches, positive: bool, session):
         '''
         Update vouch to True/False for +1/-1
         Then update user's vouch value in Users table twice
@@ -72,39 +62,37 @@ class Commands:
         '''
         vouch.update(positive, session)
         # update_user_vouch twice because -1 -> +1 = 2
-        Commands.update_user_vouch(vouch.receiver, positive, session)
-        Commands.update_user_vouch(vouch.receiver, positive, session)
+        Commands.update_user_vouch(target_id, positive, session)
+        Commands.update_user_vouch(target_id, positive, session)
 
     @staticmethod
-    def check_duplicate_vouch(giver: str, receiver: str, positive: bool, session):
+    def check_duplicate_vouch(giver_id: int, receiver_id: int, positive: bool, session):
         '''
         Query vouches table to find a vouch with specified giver/receiver
         If found, return the vouch for manipulation
         else create the vouch and save to vouches table
         '''
         # Returns None if no vouch matches giver, receiver filter
-        vouch = Vouches.get_vouch(giver, receiver, session)
+        vouch = Vouches.get_vouch(giver_id, receiver_id, session)
 
-        if vouch: # If a vouch is found that matches, return the vouch
+        # If a vouch is found that matches, return the vouch
+        if vouch:
             return vouch
 
-        else: # Creates a vouch and saves to db
-            data = {'giver': giver, 'receiver': receiver, 'positive': positive}
-            vouch_obj = Vouches(data)
-            vouch_obj.save(session)
-
+        else:
             return False
 
     @staticmethod
-    def check_cooldown(giver: str, session):
+    def check_cooldown(giver_id: int, session):
         '''
         Find the most recently given vouch from a user
         If there is no vouch that matches giver, then return True
         If there is a vouch found check the time
         Make sure it's been 5 minutes since it was given using given_at column
         '''
-        vouch_obj = Vouches.get_latest(giver, session)
-        if not vouch_obj: # If never vouched then there is no cd
+        vouch_obj = Vouches.get_latest(giver_id, session)
+        # If never given a vouch then there is no cd
+        if not vouch_obj:
             return True
 
         td = datetime.datetime.utcnow() - vouch_obj.given_at

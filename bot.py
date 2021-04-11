@@ -48,16 +48,40 @@ async def on_message(message):
     '''
     if msg.startswith('$convertall'):
         user_dict = User.get_all_users(session)
-        await cmds.send_message('Querying DB')
+
+        await cmds.send_message('Querying users tables')
+        await cmds.send_message(f'Starting conversion on {len(user_dict)} users...')
         for u in user_dict:
             username = u.user
             user = message.guild.get_member_named(username)
             if user:
-                user_obj = User.get_user(username, session)
+                user_obj = User.get_user_named(username, session)
                 user_obj.update_discord_id(user.id, session)
                 await cmds.send_message(f'Linked {username} with Discord Id: {user.id}')
             else:
-                await cmds.send_message(f"{username} not found in server.")
+                await cmds.send_message(f"{username} not found in server!")
+        await cmds.send_message("Users conversion complete!")
+
+        vouch_dict = Vouches.get_all_vouches(session)
+
+        await cmds.send_message('Querying vouches table')
+        await cmds.send_message(f'Starting conversion on {len(vouch_dict)} vouches...')
+        for v in vouch_dict:
+            giver_name = v.giver
+            receiver_name = v.receiver
+
+            giver = message.guild.get_member_named(giver_name)
+            receiver = message.guild.get_member_named(receiver_name)
+
+            if giver and receiver:
+                vouch = Vouches.get_vouch_named(giver_name, receiver_name, session)
+                vouch.update_discord_id(giver.id, receiver.id, session)
+                await cmds.send_message(f"giver:{giver_name} and receiver:{receiver_name} \
+                    vouch succesfully updated.")
+            else:
+                await cmds.send_message(f"giver:{giver_name} or receiver:{receiver_name} \
+                    not found in server!")
+        await cmds.send_message("Vouches conversion complete!")
         return
 
     '''
@@ -99,12 +123,13 @@ async def on_message(message):
             User's last given vouch time cannot be <5 mins.
             '''
             # check_cooldown() returns False if cooldown not up
-            if not Commands.check_cooldown(user, session):
+            '''
+            if not Commands.check_cooldown(user_id, session):
                 await cmds.send_cooldown(cmds.cooldown)
                 return
-
+            '''
             # Checks if user gave target a vouch before, returns the vouch if exists. Else false
-            vouch = Commands.check_duplicate_vouch(user, target, positive, session)
+            vouch = Commands.check_duplicate_vouch(user_id, target_id, positive, session)
 
             if vouch: # If there is existing vouch before
                 old_pos = vouch.positive
@@ -114,7 +139,7 @@ async def on_message(message):
                     return
 
                 else: # Change vouch from pos -> neg or vice versa
-                    Commands.change_vouch(vouch, positive, session)
+                    Commands.change_vouch(target_id, vouch, positive, session)
                     target = User.get_user(target_id, session)
                     new_pos = (lambda x: "+1" if x == True else "-1")(positive)
                     old_pos = (lambda x: "-1" if x == "+1" else "+1")(new_pos)
@@ -123,10 +148,17 @@ async def on_message(message):
                         {target.user} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
+            # If there is no duplicate vouch, create one and save to db
+            else:
+                data = {'giver': user, 'giver_id': user_id, 'receiver': target, 'receiver_id': target_id, 'positive': positive}
+                vouch = Vouches(data)
+                vouch.save(session)
+
             # Check to see if vouch receiver is in user database
             if not User.get_user(target_id, session):
+                # Create a new user and save to db if receiver is not in db
                 new_user = User({'discord_id': target_id, 'user': target, 'vouches': 0})
-                new_user.save()
+                new_user.save(session)
 
             if positive: # Assigning literal for use in vouch_msg
                 pos = "+1"
@@ -163,7 +195,7 @@ async def on_message(message):
         # This checks for $vouch @mention history
         if words[-1] == 'history':
             # queries vouches table and returns list of vouches given to target
-            history =  Vouches.get_history(target, session)
+            history =  Vouches.get_history(target_id, session)
             await cmds.send_history(history, target, target_avatar)
             return
 

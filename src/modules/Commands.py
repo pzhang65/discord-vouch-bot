@@ -1,3 +1,4 @@
+#src/modules/Commands.py
 import discord
 import datetime
 from src.models.User import User
@@ -175,7 +176,11 @@ class Commands:
         embed.add_field(name='Features', value='Users can give and check +1 or -1 vouches to other users.\nVouches are stored in a database and are tied to Discord username (NOT server nickname).')
         embed.add_field(name='Giving ($vouch)', value='A user can only give 1 vouch per 5 mins.\nYou CANNOT give duplicate vouches to the same user.\nPrevious vouches CAN be changed from positive to negative and vice versa.\nVouches can be only given in the #vouches channels.')
         embed.add_field(name='Checking ($check)', value="Check user's vouch score with a @mention.\n$check @mention history to check from whom the vouches came from")
-        embed.set_author(name='Vouch Bot v1.4.0', icon_url=avatar)
+        embed.set_author(name='Vouch Bot v1.5.0', icon_url=avatar)
+        await self.msg.channel.send(embed=embed)
+
+    async def send_message(self, message: str):
+        embed = self.new_embed(message, title='', color=self.YELLOW)
         await self.msg.channel.send(embed=embed)
 
     async def about(self):

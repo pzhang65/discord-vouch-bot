@@ -6,12 +6,13 @@ from src.models import Session
 from src.models.User import User
 from src.models.Vouches import Vouches
 from src.modules.Commands import Commands
+from src.intents import intents
 
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-client = discord.Client()
+client = discord.Client(intents=intents)
 
 # Create a session using sessionmaker to connect with DB
 session = Session()
@@ -45,6 +46,20 @@ async def on_message(message):
     $vouchhelp sends an emb msg with description of various commands
     and how the bot operates.
     '''
+    if msg.startswith('$convertall'):
+        user_dict = User.get_all_users(session)
+        await cmds.send_message('Querying DB')
+        for u in user_dict:
+            username = u.user
+            user = message.guild.get_member_named(username)
+            if user:
+                user_obj = User.get_user(username, session)
+                user_obj.update_discord_id(user.id, session)
+                await cmds.send_message(f'Linked {username} with Discord Id: {user.id}')
+            else:
+                await cmds.send_message(f"{username} not found in server.")
+        return
+
     if msg.startswith('$vouchhelp'):
         await cmds.help(bot_avatar)
         return
@@ -66,8 +81,11 @@ async def on_message(message):
 
         else:
 
+            discord_id = int(message.author.id)
             user = str(message.author)
             user_avatar = message.author.avatar_url
+
+            print(discord_id)
 
             target = str(message.mentions[0])
             positive = Commands.check_positive(words) # Assigns boolean value to +1/-1
@@ -148,7 +166,7 @@ async def on_message(message):
                 await cmds.view_vouch(f'{target} has no vouches!', target, target_avatar)
                 return
 
-            msg = f'{user.user} has {user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
+            msg = f'{user.user}({user.discord_id}) has {user.vouches} vouches.\nTip: $check @mention history to see full vouch history.'
             await cmds.view_vouch(msg, target, target_avatar)
 
     '''
@@ -191,5 +209,6 @@ async def on_message(message):
             else:
                 msg = f'{user_obj.user} now has {user_obj.vouches} vouches.'
                 await cmds.view_vouch(msg, user_obj.user, target_avatar)
+
 
 client.run(TOKEN)

@@ -123,11 +123,10 @@ async def on_message(message):
             User's last given vouch time cannot be <5 mins.
             '''
             # check_cooldown() returns False if cooldown not up
-            '''
             if not Commands.check_cooldown(user_id, session):
                 await cmds.send_cooldown(cmds.cooldown)
                 return
-            '''
+
             # Checks if user gave target a vouch before, returns the vouch if exists. Else false
             vouch = Commands.check_duplicate_vouch(user_id, target_id, positive, session)
 
@@ -196,7 +195,7 @@ async def on_message(message):
         if words[-1] == 'history':
             # queries vouches table and returns list of vouches given to target
             history =  Vouches.get_history(target_id, session)
-            await cmds.send_history(history, target, target_avatar)
+            await cmds.send_history(history, target_id, target, target_avatar)
             return
 
         else: # Just check for numerical vouch value

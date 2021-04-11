@@ -9,7 +9,7 @@ Currently serving the **NA AAU Megaserver (1000+ users).**
 * Python (bot, modules, models)
 * discord.py (API wrapper for Discord)
 * SQLite3 (data persistence)
-* SQLAlchemy (ORM)
+* SQLAlchemy + Alembic (ORM and migration)
 * Docker + Docker Compose (for easy deployment, volume mounted for DB)
 * AWS (EC2) instance (Amzn linux platform)
 

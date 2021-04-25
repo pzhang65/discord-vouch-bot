@@ -109,11 +109,13 @@ async def on_message(message):
 
         else:
             user = str(message.author)
+            nickname = str(message.author.display_name)
             user_id = int(message.author.id)
             user_avatar = message.author.avatar_url
 
 
             target = str(message.mentions[0])
+            target_nick = str(message.mentions[0].display_name)
             target_id = int(message.mentions[0].id)
             positive = Commands.check_positive(words) # Assigns boolean value to +1/-1
 
@@ -144,7 +146,7 @@ async def on_message(message):
                     old_pos = (lambda x: "-1" if x == "+1" else "+1")(new_pos)
 
                     await cmds.revouch(f'Changed previous {old_pos} vouch to {new_pos} vouch.\n\
-                        {target.user} now has {target.vouches} vouches.', user, user_avatar)
+                        {target_nick} now has {target.vouches} vouches.', user, user_avatar)
                     return
 
             # If there is no duplicate vouch, create one and save to db
@@ -172,9 +174,9 @@ async def on_message(message):
             Commands.update_user_vouch(target_id, positive, session)
             updated_user = User.get_user(target_id, session)
 
-            vouch_msg = f'{user} is giving {target} a {pos} vouch.\n{target} now has {updated_user.vouches} vouches.\n\
+            vouch_msg = f'{nickname} is giving {target_nick} a {pos} vouch.\n{target_nick} now has {updated_user.vouches} vouches.\n\
                 Tip: $check @mention history to see full vouch history.'
-            await cmds.send_vouch(vouch_msg, user, user_avatar)
+            await cmds.send_vouch(vouch_msg, nickname, user_avatar)
 
     '''
     Users can check other users vouches:
@@ -188,6 +190,7 @@ async def on_message(message):
             return
 
         target = str(message.mentions[0])
+        target_nick = str(message.mentions[0].display_name)
         target_id = int(message.mentions[0].id)
         target_avatar = message.mentions[0].avatar_url
 
@@ -195,7 +198,7 @@ async def on_message(message):
         if words[-1] == 'history':
             # queries vouches table and returns list of vouches given to target
             history =  Vouches.get_history(target_id, session)
-            await cmds.send_history(history, target_id, target, target_avatar)
+            await cmds.send_history(history, target_id, target_nick, target_avatar)
             return
 
         else: # Just check for numerical vouch value
@@ -203,12 +206,12 @@ async def on_message(message):
             user = User.get_user(target_id, session)
 
             if not user: # if user does not exist, it means user has no vouches
-                await cmds.view_vouch(f'{target} has no vouches!', target_id, target, target_avatar)
+                await cmds.view_vouch(f'{target_nick} has no vouches!', target_id, target_nick, target_avatar)
                 return
 
             msg = f'{user.user} has {user.vouches} vouches.\n\
                 Tip: $check @mention history to see full vouch history.'
-            await cmds.view_vouch(msg, target_id, target, target_avatar)
+            await cmds.view_vouch(msg, target_id, target_nick, target_avatar)
 
     '''
     Users with the role "Admin" can manually set the vouches column in a user row

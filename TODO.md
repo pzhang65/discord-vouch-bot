@@ -2,10 +2,8 @@
 
 ### Urgent
 - [ ] Add regex to command recognition
-- [ ] Change embed author to server nickname with no discriminator
 
 ### Features
-- [ ] Add cooldown remaining time to cooldown messages
 - [ ] Extra tags i.e. Scammer, whale, etc.
 - [ ] ranking list for most vouches/least vouches etc.
 
@@ -26,3 +24,5 @@
   * $convertusers and $convertvouches
   * change PK args in model columns
   * reassign PKs in users and vouches table
+- [x] Change embed author to server nickname with no discriminator
+- [x] Add cooldown remaining time to cooldown messages

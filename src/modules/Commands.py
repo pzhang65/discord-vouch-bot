@@ -15,7 +15,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user\n$check @user history\n$vouchhelp for more info'
     yourself = 'You cannot vouch for yourself.\n$vouchhelp for more info'
     dup = 'Cannot give a duplicate vouch to the same user.\n$vouchhelp for more info'
-    cooldown = 'Please wait 5 mins between every vouch.\n$vouchhelp for more info'
+    cooldown = 'Please wait 5 mins between every vouch.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -96,10 +96,14 @@ class Commands:
             return True
 
         td = datetime.datetime.utcnow() - vouch_obj.given_at
-        if td.total_seconds() > 300: # more than 30 mins
-            return True
+        secs_since_vouch = td.total_seconds()
+        # more than 5 mins
+        if secs_since_vouch > 300:
+            # no cooldown
+            return None
         else:
-            return False # 5 min cd not up
+            # return seconds left in vouch cooldown
+            return 300 - secs_since_vouch
 
     async def send_error(self, message: str):
         '''
@@ -133,11 +137,14 @@ class Commands:
         embed.set_author(name=user, icon_url=avatar)
         await self.msg.channel.send(embed=embed)
 
-    async def send_cooldown(self, message: str):
+    async def send_cooldown(self, message: str, cooldown: float):
         '''
         Sends a wait cooldown message to object channel
         '''
+        # cast to integer, and round down
+        cooldown = int(cooldown)
         embed = self.new_embed(message, color=self.YELLOW, title='Vouching Cooldown')
+        embed.add_field(name='Features', value=f'Vouch cooldown has {cooldown}s remaining')
         await self.msg.channel.send(embed=embed)
 
     async def send_history(self, vouches: list, user_id: int, user: str, avatar):

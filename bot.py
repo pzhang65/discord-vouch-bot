@@ -124,9 +124,10 @@ async def on_message(message):
             This time is checked when a user gives a vouch.
             User's last given vouch time cannot be <5 mins.
             '''
-            # check_cooldown() returns False if cooldown not up
-            if not Commands.check_cooldown(user_id, session):
-                await cmds.send_cooldown(cmds.cooldown)
+            # check_cooldown() returns None if cooldown is up, else returns cooldown remaining
+            cooldown = Commands.check_cooldown(user_id, session)
+            if cooldown:
+                await cmds.send_cooldown(cmds.cooldown, cooldown)
                 return
 
             # Checks if user gave target a vouch before, returns the vouch if exists. Else false

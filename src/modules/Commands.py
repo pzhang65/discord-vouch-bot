@@ -15,7 +15,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user\n$check @user history\n$vouchhelp for more info'
     yourself = 'You cannot vouch for yourself.\n$vouchhelp for more info'
     dup = 'Cannot give a duplicate vouch to the same user.\n$vouchhelp for more info'
-    cooldown = 'Please wait 5 mins between every vouch.'
+    cooldown = 'Please wait 5 seconds between every vouch.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -98,12 +98,12 @@ class Commands:
         td = datetime.datetime.utcnow() - vouch_obj.given_at
         secs_since_vouch = td.total_seconds()
         # more than 5 mins
-        if secs_since_vouch > 300:
+        if secs_since_vouch > 5:
             # no cooldown
             return None
         else:
             # return seconds left in vouch cooldown
-            return 300 - secs_since_vouch
+            return 5 - secs_since_vouch
 
     async def send_error(self, message: str):
         '''

@@ -15,7 +15,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user\n$check @user history\n$vouchhelp for more info'
     yourself = 'You cannot vouch for yourself.\n$vouchhelp for more info'
     dup = 'Cannot give a duplicate vouch to the same user.\n$vouchhelp for more info'
-    cooldown = 'Please wait 5 mins between every vouch.'
+    cooldown = 'Please wait 5 seconds between every vouch.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -88,7 +88,7 @@ class Commands:
         Find the most recently given vouch from a user
         If there is no vouch that matches giver, then return True
         If there is a vouch found check the time
-        Make sure it's been 5 minutes since it was given using given_at column
+        Make sure it's been 5 seconds since it was given using given_at column
         '''
         vouch_obj = Vouches.get_latest(giver_id, session)
         # If never given a vouch then there is no cd
@@ -98,12 +98,12 @@ class Commands:
         td = datetime.datetime.utcnow() - vouch_obj.given_at
         secs_since_vouch = td.total_seconds()
         # more than 5 mins
-        if secs_since_vouch > 300:
+        if secs_since_vouch > 5:
             # no cooldown
             return None
         else:
             # return seconds left in vouch cooldown
-            return 300 - secs_since_vouch
+            return 5 - secs_since_vouch
 
     async def send_error(self, message: str):
         '''
@@ -122,7 +122,7 @@ class Commands:
 
     async def view_vouch(self, message: str, user_id: int, user: str, avatar):
         '''
-        Sends a success message to the object channel
+        DEPRECATED
         '''
         embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         embed.set_author(name=user, icon_url=avatar)
@@ -150,9 +150,11 @@ class Commands:
     async def send_history(self, vouches: list, user_id: int, user: str, avatar):
         '''
         Sends the Discord ID of all people who gave the target user a vouch
-        Queried from vouches table and includes date given and +1/-1
+        Queried from vouches table and includes date given.
+        Check mark denotes positive vouch. Stop line denotes negative vouch.
         '''
-        embed = self.new_embed(description='', color=self.BLUE, title='Vouch History')
+        title_msg = f"{user} has {len(vouches)} vouches:"
+        embed = self.new_embed(description='', color=self.BLUE, title=title_msg)
         for x in vouches:
             if x.positive:
                 mark = '✅'

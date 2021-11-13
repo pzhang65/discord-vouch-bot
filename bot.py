@@ -195,24 +195,18 @@ async def on_message(message):
         target_id = int(message.mentions[0].id)
         target_avatar = message.mentions[0].avatar_url
 
-        # This checks for $vouch @mention history
-        if words[-1] == 'history':
-            # queries vouches table and returns list of vouches given to target
-            history =  Vouches.get_history(target_id, session)
-            await cmds.send_history(history, target_id, target_nick, target_avatar)
+        # Get the @mention user
+        user = User.get_user(target_id, session)
+
+        if not user: # if user does not exist, it means user has no vouches
+            await cmds.view_vouch(f'{target_nick} has no vouches!', target_id, target_nick, target_avatar)
             return
 
-        else: # Just check for numerical vouch value
-            # Get the @mention user
-            user = User.get_user(target_id, session)
-
-            if not user: # if user does not exist, it means user has no vouches
-                await cmds.view_vouch(f'{target_nick} has no vouches!', target_id, target_nick, target_avatar)
-                return
-
-            msg = f'{user.user} has {user.vouches} vouches.\n\
-                Tip: $check @mention history to see full vouch history.'
-            await cmds.view_vouch(msg, target_id, target_nick, target_avatar)
+        # queries vouches table and returns list of vouches given to target
+        history =  Vouches.get_history(target_id, session)
+        # view_vouch() deprecated, all check commands return both # of vouches
+        # also returns vouch history
+        await cmds.send_history(history, target_id, target_nick, target_avatar)
 
     '''
     Users with the role "Admin" can manually set the vouches column in a user row

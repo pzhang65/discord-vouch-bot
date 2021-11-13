@@ -88,7 +88,7 @@ class Commands:
         Find the most recently given vouch from a user
         If there is no vouch that matches giver, then return True
         If there is a vouch found check the time
-        Make sure it's been 5 minutes since it was given using given_at column
+        Make sure it's been 5 seconds since it was given using given_at column
         '''
         vouch_obj = Vouches.get_latest(giver_id, session)
         # If never given a vouch then there is no cd

@@ -122,7 +122,7 @@ class Commands:
 
     async def view_vouch(self, message: str, user_id: int, user: str, avatar):
         '''
-        Sends a success message to the object channel
+        DEPRECATED
         '''
         embed = self.new_embed(message, color=self.BLUE, title='Vouch Info')
         embed.set_author(name=user, icon_url=avatar)
@@ -150,9 +150,11 @@ class Commands:
     async def send_history(self, vouches: list, user_id: int, user: str, avatar):
         '''
         Sends the Discord ID of all people who gave the target user a vouch
-        Queried from vouches table and includes date given and +1/-1
+        Queried from vouches table and includes date given.
+        Check mark denotes positive vouch. Stop line denotes negative vouch.
         '''
-        embed = self.new_embed(description='', color=self.BLUE, title='Vouch History')
+        title_msg = f"{user} has {len(vouches)} vouches:"
+        embed = self.new_embed(description='', color=self.BLUE, title=title_msg)
         for x in vouches:
             if x.positive:
                 mark = '✅'

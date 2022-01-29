@@ -15,7 +15,7 @@ class Commands:
     cformat = 'Valid formats:\n$check @user\n$check @user history\n$vouchhelp for more info'
     yourself = 'You cannot vouch for yourself.\n$vouchhelp for more info'
     dup = 'Cannot give a duplicate vouch to the same user.\n$vouchhelp for more info'
-    cooldown = 'Please wait 5 seconds between every vouch.'
+    cooldown = 'Please wait 10 seconds between every vouch.'
 
     def __init__(self, msg : discord.Message):
         self.msg = msg
@@ -88,22 +88,22 @@ class Commands:
         Find the most recently given vouch from a user
         If there is no vouch that matches giver, then return True
         If there is a vouch found check the time
-        Make sure it's been 5 seconds since it was given using given_at column
+        Make sure it's been 10 seconds since it was given using given_at column
         '''
         vouch_obj = Vouches.get_latest(giver_id, session)
         # If never given a vouch then there is no cd
         if not vouch_obj:
-            return True
+            return None
 
         td = datetime.datetime.utcnow() - vouch_obj.given_at
         secs_since_vouch = td.total_seconds()
-        # more than 5 mins
-        if secs_since_vouch > 5:
+        # 10 seconds
+        if secs_since_vouch >= 10:
             # no cooldown
             return None
         else:
             # return seconds left in vouch cooldown
-            return 5 - secs_since_vouch
+            return 10 - secs_since_vouch
 
     async def send_error(self, message: str):
         '''
